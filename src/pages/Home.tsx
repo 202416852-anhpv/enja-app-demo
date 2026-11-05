@@ -1,41 +1,26 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import InstallScreen from "./InstallScreen";
+import LanguageSelect from "./LanguageSelect";
+
+const INSTALL_SCREEN_SEEN_KEY = "enja:install-screen-seen";
+
+function isAppInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches;
+}
 
 export default function Home() {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallScreen, setShowInstallScreen] = useState(() => {
+    if (isAppInstalled()) return false;
+    return localStorage.getItem(INSTALL_SCREEN_SEEN_KEY) === null;
+  });
 
-  useEffect(() => {
-    const onBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event as BeforeInstallPromptEvent);
-    };
-    const onAppInstalled = () => setInstallPrompt(null);
-
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-    window.addEventListener("appinstalled", onAppInstalled);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", onAppInstalled);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === "accepted") {
-      setInstallPrompt(null);
-    }
+  const finishInstallScreen = () => {
+    localStorage.setItem(INSTALL_SCREEN_SEEN_KEY, "true");
+    setShowInstallScreen(false);
   };
 
-  return (
-    <div>
-      <h1 className="text-2xl">Welcome to the Home Page</h1>
-      {installPrompt && (
-        <Button className="mt-4" onClick={handleInstall}>
-          Cài đặt ứng dụng
-        </Button>
-      )}
-    </div>
-  );
+  if (showInstallScreen) {
+    return <InstallScreen onDone={finishInstallScreen} />;
+  }
+  return <LanguageSelect />;
 }

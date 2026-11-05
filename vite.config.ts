@@ -20,10 +20,13 @@ export default defineConfig({
       manifest: {
         name: 'EnJa App',
         short_name: 'EnJa',
+        description: 'Ứng dụng hỗ trợ học tiếng Anh và tiếng Nhật',
         lang: 'vi',
         start_url: '/',
         scope: '/',
         display: 'standalone',
+        theme_color: '#faf9f5',
+        background_color: '#faf9f5',
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
